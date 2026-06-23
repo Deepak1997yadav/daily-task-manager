@@ -15,12 +15,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -372,7 +368,7 @@ fun TaskFormScreen(
                 Button(
                     onClick = {
                         val dueTimestamp = DateTimeUtil.parseDateTime(dueDate, dueTime)
-                        val reminderTimestamp = if (hasReminder) parseDateTime(reminderDate, reminderTime) else null
+                        val reminderTimestamp = if (hasReminder) DateTimeUtil.parseDateTime(reminderDate, reminderTime) else null
                         val interval = if (repeatReminder) (repeatInterval.toLongOrNull() ?: 0) * 60000 else null
 
                         val task = Task(

@@ -2,16 +2,20 @@ package com.dailytaskmanager.app.presentation.ui.task_list
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -382,12 +386,12 @@ fun TaskCard(
     val (catLabel, catColor, catIcon) = categoryInfo[task.category] ?: Triple("General", CategoryGeneral, Icons.Default.TaskAlt)
 
     val priorityInfo = mapOf(
-        1 to Triple(PriorityLow, "Low"),
-        2 to Triple(PriorityMedium, "Med"),
-        3 to Triple(PriorityHigh, "High"),
-        4 to Triple(PriorityUrgent, "Urg")
+        1 to Pair(PriorityLow, "Low"),
+        2 to Pair(PriorityMedium, "Med"),
+        3 to Pair(PriorityHigh, "High"),
+        4 to Pair(PriorityUrgent, "Urg")
     )
-    val (priColor, priLabel) = priorityInfo[task.priority] ?: Triple(PriorityLow, "Low")
+    val (priColor, priLabel) = priorityInfo[task.priority] ?: Pair(PriorityLow, "Low")
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()

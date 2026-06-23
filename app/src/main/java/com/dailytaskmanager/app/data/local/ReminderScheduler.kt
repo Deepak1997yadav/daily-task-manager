@@ -14,7 +14,7 @@ class ReminderReceiver : BroadcastReceiver() {
         val taskId = intent.getIntExtra("task_id", 0)
         val title = intent.getStringExtra("task_title") ?: "Task Reminder"
 
-        val notification = NotificationCompat.Builder(context, REMINDER_CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, ReminderScheduler.REMINDER_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle("Task Reminder")
             .setContentText(title)
