@@ -25,19 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dailytaskmanager.app.domain.model.Task
 import com.dailytaskmanager.app.presentation.viewmodel.TaskViewModel
 import com.dailytaskmanager.app.ui.theme.*
-import com.dailytaskmanager.app.ui.theme.DarkSurface
-import com.dailytaskmanager.app.ui.theme.DarkSurfaceHigh
-import com.dailytaskmanager.app.ui.theme.Teal
-import com.dailytaskmanager.app.ui.theme.TextPrimary
-import com.dailytaskmanager.app.ui.theme.TextSecondary
-import com.dailytaskmanager.app.ui.theme.TextTertiary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,7 +95,7 @@ fun TaskFormScreen(
             )
     ) {
         Scaffold(
-            containerColor = Color.Transparent,
+            containerColor = androidx.compose.ui.graphics.Color.Transparent,
             topBar = {
                 TopAppBar(
                     title = {
@@ -117,7 +110,7 @@ fun TaskFormScreen(
                             Icon(Icons.Default.ArrowBack, null, tint = TextSecondary)
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
                 )
             }
         ) { padding ->
@@ -173,7 +166,7 @@ fun TaskFormScreen(
                                 )
                                 .border(
                                     1.dp,
-                                    if (selected) color.copy(alpha = 0.4f) else Color.Transparent,
+                                    if (selected) color.copy(alpha = 0.4f) else androidx.compose.ui.graphics.Color.Transparent,
                                     RoundedCornerShape(12.dp)
                                 )
                                 .clickable { category = key }
@@ -214,7 +207,7 @@ fun TaskFormScreen(
                                 )
                                 .border(
                                     1.dp,
-                                    if (selected) color.copy(alpha = 0.4f) else Color.Transparent,
+                                    if (selected) color.copy(alpha = 0.4f) else androidx.compose.ui.graphics.Color.Transparent,
                                     RoundedCornerShape(10.dp)
                                 )
                                 .clickable { priority = p }
