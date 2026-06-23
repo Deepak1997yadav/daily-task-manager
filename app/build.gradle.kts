@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     kotlin("kapt")
-
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
@@ -42,6 +42,10 @@ android {
     }
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -59,7 +63,7 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     implementation(libs.bundles.room)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler.ksp)
 
     implementation(libs.work.runtime)
 
