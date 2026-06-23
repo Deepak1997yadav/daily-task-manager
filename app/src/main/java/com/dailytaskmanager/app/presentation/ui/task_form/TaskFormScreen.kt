@@ -150,7 +150,7 @@ fun TaskFormScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // ── Category ──
-                sectionLabel("Category")
+                Text("Category", style = MaterialTheme.typography.labelMedium.copy(color = TextSecondary, fontWeight = FontWeight.W600, letterSpacing = 0.5.sp))
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     catKeys.forEachIndexed { i, key ->
@@ -188,7 +188,7 @@ fun TaskFormScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // ── Priority ──
-                sectionLabel("Priority")
+                Text("Priority", style = MaterialTheme.typography.labelMedium.copy(color = TextSecondary, fontWeight = FontWeight.W600, letterSpacing = 0.5.sp))
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     val prioValues = listOf(1, 2, 3, 4)
@@ -228,7 +228,7 @@ fun TaskFormScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // ── Assignee ──
-                sectionLabel("Assignee")
+                Text("Assignee", style = MaterialTheme.typography.labelMedium.copy(color = TextSecondary, fontWeight = FontWeight.W600, letterSpacing = 0.5.sp))
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = assignee,
@@ -244,7 +244,7 @@ fun TaskFormScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // ── Due Date ──
-                sectionLabel("Due Date & Time")
+                Text("Due Date & Time", style = MaterialTheme.typography.labelMedium.copy(color = TextSecondary, fontWeight = FontWeight.W600, letterSpacing = 0.5.sp))
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
@@ -419,18 +419,6 @@ fun TaskFormScreen(
             }
         }
     }
-}
-
-@Composable
-fun sectionLabel(text: String) {
-    Text(
-        text,
-        style = MaterialTheme.typography.labelMedium.copy(
-            color = TextSecondary,
-            fontWeight = FontWeight.W600,
-            letterSpacing = 0.5.sp
-        )
-    )
 }
 
 fun tfc() = OutlinedTextFieldDefaults.colors(
