@@ -129,7 +129,7 @@ fun TaskFormScreen(
                     placeholder = { Text("What needs to be done?", color = TextTertiary) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    colors = tfc(),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Teal.copy(alpha = 0.6f), unfocusedBorderColor = DarkSurfaceHigh, cursorColor = Teal, focusedLabelColor = TextSecondary, unfocusedLabelColor = TextTertiary, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, focusedContainerColor = DarkSurface, unfocusedContainerColor = DarkSurface),
                     shape = RoundedCornerShape(12.dp)
                 )
 
@@ -143,7 +143,7 @@ fun TaskFormScreen(
                     placeholder = { Text("Add details...", color = TextTertiary) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3,
-                    colors = tfc(),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Teal.copy(alpha = 0.6f), unfocusedBorderColor = DarkSurfaceHigh, cursorColor = Teal, focusedLabelColor = TextSecondary, unfocusedLabelColor = TextTertiary, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, focusedContainerColor = DarkSurface, unfocusedContainerColor = DarkSurface),
                     shape = RoundedCornerShape(12.dp)
                 )
 
@@ -237,7 +237,7 @@ fun TaskFormScreen(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     leadingIcon = { Icon(Icons.Default.Person, null, tint = TextTertiary, modifier = Modifier.size(18.dp)) },
-                    colors = textFieldColors(),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Teal.copy(alpha = 0.6f), unfocusedBorderColor = DarkSurfaceHigh, cursorColor = Teal, focusedLabelColor = TextSecondary, unfocusedLabelColor = TextTertiary, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, focusedContainerColor = DarkSurface, unfocusedContainerColor = DarkSurface),
                     shape = RoundedCornerShape(12.dp)
                 )
 
@@ -254,7 +254,7 @@ fun TaskFormScreen(
                         modifier = Modifier.weight(1f),
                         singleLine = true,
                         leadingIcon = { Icon(Icons.Default.CalendarMonth, null, tint = TextTertiary, modifier = Modifier.size(18.dp)) },
-                        colors = textFieldColors(),
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Teal.copy(alpha = 0.6f), unfocusedBorderColor = DarkSurfaceHigh, cursorColor = Teal, focusedLabelColor = TextSecondary, unfocusedLabelColor = TextTertiary, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, focusedContainerColor = DarkSurface, unfocusedContainerColor = DarkSurface),
                         shape = RoundedCornerShape(12.dp)
                     )
                     OutlinedTextField(
@@ -264,7 +264,7 @@ fun TaskFormScreen(
                         modifier = Modifier.weight(1f),
                         singleLine = true,
                         leadingIcon = { Icon(Icons.Default.Schedule, null, tint = TextTertiary, modifier = Modifier.size(18.dp)) },
-                        colors = textFieldColors(),
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Teal.copy(alpha = 0.6f), unfocusedBorderColor = DarkSurfaceHigh, cursorColor = Teal, focusedLabelColor = TextSecondary, unfocusedLabelColor = TextTertiary, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, focusedContainerColor = DarkSurface, unfocusedContainerColor = DarkSurface),
                         shape = RoundedCornerShape(12.dp)
                     )
                 }
@@ -312,7 +312,7 @@ fun TaskFormScreen(
                                         placeholder = { Text("YYYY-MM-DD", color = TextTertiary) },
                                         modifier = Modifier.weight(1f),
                                         singleLine = true,
-                                        colors = textFieldColors(),
+                                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Teal.copy(alpha = 0.6f), unfocusedBorderColor = DarkSurfaceHigh, cursorColor = Teal, focusedLabelColor = TextSecondary, unfocusedLabelColor = TextTertiary, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, focusedContainerColor = DarkSurface, unfocusedContainerColor = DarkSurface),
                                         shape = RoundedCornerShape(10.dp)
                                     )
                                     OutlinedTextField(
@@ -321,7 +321,7 @@ fun TaskFormScreen(
                                         placeholder = { Text("HH:MM", color = TextTertiary) },
                                         modifier = Modifier.weight(1f),
                                         singleLine = true,
-                                        colors = textFieldColors(),
+                                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Teal.copy(alpha = 0.6f), unfocusedBorderColor = DarkSurfaceHigh, cursorColor = Teal, focusedLabelColor = TextSecondary, unfocusedLabelColor = TextTertiary, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, focusedContainerColor = DarkSurface, unfocusedContainerColor = DarkSurface),
                                         shape = RoundedCornerShape(10.dp)
                                     )
                                 }
@@ -358,7 +358,7 @@ fun TaskFormScreen(
                                         label = { Text("Interval (minutes)", color = TextSecondary) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
-                                        colors = textFieldColors(),
+                                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Teal.copy(alpha = 0.6f), unfocusedBorderColor = DarkSurfaceHigh, cursorColor = Teal, focusedLabelColor = TextSecondary, unfocusedLabelColor = TextTertiary, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, focusedContainerColor = DarkSurface, unfocusedContainerColor = DarkSurface),
                                         shape = RoundedCornerShape(10.dp)
                                     )
                                 }
@@ -420,18 +420,6 @@ fun TaskFormScreen(
         }
     }
 }
-
-fun tfc() = OutlinedTextFieldDefaults.colors(
-    focusedBorderColor = Teal.copy(alpha = 0.6f),
-    unfocusedBorderColor = DarkSurfaceHigh,
-    cursorColor = Teal,
-    focusedLabelColor = TextSecondary,
-    unfocusedLabelColor = TextTertiary,
-    focusedTextColor = TextPrimary,
-    unfocusedTextColor = TextPrimary,
-    focusedContainerColor = DarkSurface,
-    unfocusedContainerColor = DarkSurface
-)
 
 fun parseDateTime(date: String, time: String): Long? {
     if (date.isBlank()) return null
