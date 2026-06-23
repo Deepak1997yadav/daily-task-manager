@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.dailytaskmanager.app.domain.model.Task
 import com.dailytaskmanager.app.presentation.viewmodel.TaskViewModel
 import com.dailytaskmanager.app.ui.theme.*
+import com.dailytaskmanager.app.presentation.ui.task_form.DateTimeUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -372,7 +373,7 @@ fun TaskFormScreen(
                 // ── Submit Button ──
                 Button(
                     onClick = {
-                        val dueTimestamp = parseDateTime(dueDate, dueTime)
+                        val dueTimestamp = DateTimeUtil.parseDateTime(dueDate, dueTime)
                         val reminderTimestamp = if (hasReminder) parseDateTime(reminderDate, reminderTime) else null
                         val interval = if (repeatReminder) (repeatInterval.toLongOrNull() ?: 0) * 60000 else null
 
@@ -421,16 +422,4 @@ fun TaskFormScreen(
     }
 }
 
-fun parseDateTime(date: String, time: String): Long? {
-    if (date.isBlank()) return null
-    val parts = date.split("-")
-    if (parts.size != 3) return null
-    val tParts = if (time.isNotBlank()) time.split(":") else listOf("0", "0")
-    return try {
-        val cal = java.util.Calendar.getInstance().apply {
-            set(parts[0].toInt(), parts[1].toInt() - 1, parts[2].toInt(), tParts[0].toInt(), tParts[1].toInt(), 0)
-            set(java.util.Calendar.MILLISECOND, 0)
-        }
-        cal.timeInMillis
-    } catch (_: Exception) { null }
-}
+// DateTimeUtil.parseDateTime helper is in DateTimeUtil.kt
