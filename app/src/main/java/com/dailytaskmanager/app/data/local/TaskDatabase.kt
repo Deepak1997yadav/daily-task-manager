@@ -6,7 +6,7 @@ import com.dailytaskmanager.app.data.local.entity.TaskEntity
 
 @Database(
     entities = [TaskEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class TaskDatabase : RoomDatabase() {

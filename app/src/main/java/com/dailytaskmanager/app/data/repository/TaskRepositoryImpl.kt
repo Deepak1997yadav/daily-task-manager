@@ -12,8 +12,8 @@ class TaskRepositoryImpl(
     private val dao: TaskDao
 ) : TaskRepository {
 
-    override suspend fun insertTask(task: Task) {
-        dao.insertTask(task.toEntity())
+    override suspend fun insertTask(task: Task): Long {
+        return dao.insertTask(task.toEntity())
     }
 
     override suspend fun updateTask(task: Task) {
@@ -30,5 +30,29 @@ class TaskRepositoryImpl(
 
     override suspend fun getTaskById(id: Int): Task? {
         return dao.getTaskById(id)?.toTask()
+    }
+
+    override fun getTasksByCategory(category: String): Flow<List<Task>> {
+        return dao.getTasksByCategory(category).map { it.map { e -> e.toTask() } }
+    }
+
+    override fun getTasksDueBetween(start: Long, end: Long): Flow<List<Task>> {
+        return dao.getTasksDueBetween(start, end).map { it.map { e -> e.toTask() } }
+    }
+
+    override fun getOverdueTasks(now: Long): Flow<List<Task>> {
+        return dao.getOverdueTasks(now).map { it.map { e -> e.toTask() } }
+    }
+
+    override fun getTasksByAssignee(name: String): Flow<List<Task>> {
+        return dao.getTasksByAssignee(name).map { it.map { e -> e.toTask() } }
+    }
+
+    override suspend fun getPendingReminders(after: Long): List<Task> {
+        return dao.getPendingReminders(after).map { it.toTask() }
+    }
+
+    override suspend fun markNotified(id: Int) {
+        dao.markNotified(id)
     }
 }

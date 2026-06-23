@@ -60,6 +60,8 @@ dependencies {
     implementation(libs.bundles.room)
     kapt(libs.room.compiler)
 
+    implementation(libs.work.runtime)
+
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)

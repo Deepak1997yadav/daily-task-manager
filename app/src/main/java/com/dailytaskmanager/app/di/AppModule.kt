@@ -24,7 +24,7 @@ object AppModule {
             app,
             TaskDatabase::class.java,
             "task_db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
@@ -45,7 +45,13 @@ object AppModule {
             updateTask = UpdateTaskUseCase(repository),
             deleteTask = DeleteTaskUseCase(repository),
             getAllTasks = GetAllTasksUseCase(repository),
-            getTaskById = GetTaskByIdUseCase(repository)
+            getTaskById = GetTaskByIdUseCase(repository),
+            getTasksByCategory = GetTasksByCategoryUseCase(repository),
+            getTasksDueBetween = GetTasksDueBetweenUseCase(repository),
+            getOverdueTasks = GetOverdueTasksUseCase(repository),
+            getTasksByAssignee = GetTasksByAssigneeUseCase(repository),
+            getPendingReminders = GetPendingRemindersUseCase(repository),
+            markNotified = MarkNotifiedUseCase(repository)
         )
     }
 }
