@@ -16,7 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,14 +40,16 @@ fun TaskFormScreen(
 
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var dueDate by remember { mutableStateOf("") }
-    var dueTime by remember { mutableStateOf("") }
     var assignee by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("general") }
     var priority by remember { mutableIntStateOf(2) }
+    var dueMillis by remember { mutableStateOf<Long?>(null) }
+    var showDueDatePicker by remember { mutableStateOf(false) }
+    var showDueTimePicker by remember { mutableStateOf(false) }
     var hasReminder by remember { mutableStateOf(false) }
-    var reminderDate by remember { mutableStateOf("") }
-    var reminderTime by remember { mutableStateOf("") }
+    var reminderMillis by remember { mutableStateOf<Long?>(null) }
+    var showRemDatePicker by remember { mutableStateOf(false) }
+    var showRemTimePicker by remember { mutableStateOf(false) }
     var repeatReminder by remember { mutableStateOf(false) }
     var repeatInterval by remember { mutableStateOf("") }
 
@@ -66,17 +68,8 @@ fun TaskFormScreen(
             assignee = task.assignee
             category = task.category
             priority = task.priority
-            task.dueDate?.let { d ->
-                val cal = java.util.Calendar.getInstance().apply { timeInMillis = d }
-                dueDate = String.format("%04d-%02d-%02d", cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH) + 1, cal.get(java.util.Calendar.DAY_OF_MONTH))
-                dueTime = String.format("%02d:%02d", cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE))
-            }
-            task.reminderTime?.let { r ->
-                hasReminder = true
-                val cal = java.util.Calendar.getInstance().apply { timeInMillis = r }
-                reminderDate = String.format("%04d-%02d-%02d", cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH) + 1, cal.get(java.util.Calendar.DAY_OF_MONTH))
-                reminderTime = String.format("%02d:%02d", cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE))
-            }
+            dueMillis = task.dueDate
+            task.reminderTime?.let { reminderMillis = it; hasReminder = true }
             repeatReminder = task.repeatInterval != null
             task.repeatInterval?.let { repeatInterval = (it / 60000).toString() }
         }
@@ -238,27 +231,32 @@ fun TaskFormScreen(
 
                 Spacer(Modifier.height(20.dp))
 
-                // ── Due Date ──
+                // ── Due Date & Time (pickers) ──
                 Text("Due Date & Time", style = MaterialTheme.typography.labelMedium.copy(color = TextSecondary, fontWeight = FontWeight.W600, letterSpacing = 0.5.sp))
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
-                        value = dueDate,
-                        onValueChange = { dueDate = it },
-                        placeholder = { Text("YYYY-MM-DD", color = TextTertiary) },
-                        modifier = Modifier.weight(1f),
+                        value = dueMillis?.let { DateTimeUtil.formatDate(it) } ?: "",
+                        onValueChange = {},
+                        placeholder = { Text("Pick date", color = TextTertiary) },
+                        modifier = Modifier.weight(1f).clickable { showDueDatePicker = true },
+                        readOnly = true,
                         singleLine = true,
                         leadingIcon = { Icon(Icons.Default.CalendarMonth, null, tint = TextTertiary, modifier = Modifier.size(18.dp)) },
+                        trailingIcon = { Icon(Icons.Default.ExpandMore, null, tint = TextTertiary) },
                         colors = OutlinedTextFieldDefaults.colors(),
                         shape = RoundedCornerShape(12.dp)
                     )
                     OutlinedTextField(
-                        value = dueTime,
-                        onValueChange = { dueTime = it },
-                        placeholder = { Text("HH:MM", color = TextTertiary) },
-                        modifier = Modifier.weight(1f),
+                        value = dueMillis?.let { DateTimeUtil.formatTime(it) } ?: "",
+                        onValueChange = {},
+                        placeholder = { Text("Pick time", color = TextTertiary) },
+                        modifier = Modifier.weight(1f).clickable { if (dueMillis != null) showDueTimePicker = true },
+                        readOnly = true,
                         singleLine = true,
+                        enabled = dueMillis != null,
                         leadingIcon = { Icon(Icons.Default.Schedule, null, tint = TextTertiary, modifier = Modifier.size(18.dp)) },
+                        trailingIcon = { Icon(Icons.Default.ExpandMore, null, tint = TextTertiary) },
                         colors = OutlinedTextFieldDefaults.colors(),
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -302,20 +300,27 @@ fun TaskFormScreen(
                                 Spacer(Modifier.height(12.dp))
                                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     OutlinedTextField(
-                                        value = reminderDate,
-                                        onValueChange = { reminderDate = it },
-                                        placeholder = { Text("YYYY-MM-DD", color = TextTertiary) },
-                                        modifier = Modifier.weight(1f),
+                                        value = reminderMillis?.let { DateTimeUtil.formatDate(it) } ?: "",
+                                        onValueChange = {},
+                                        placeholder = { Text("Pick date", color = TextTertiary) },
+                                        modifier = Modifier.weight(1f).clickable { showRemDatePicker = true },
+                                        readOnly = true,
                                         singleLine = true,
+                                        leadingIcon = { Icon(Icons.Default.CalendarMonth, null, tint = TextTertiary, modifier = Modifier.size(18.dp)) },
+                                        trailingIcon = { Icon(Icons.Default.ExpandMore, null, tint = TextTertiary) },
                                         colors = OutlinedTextFieldDefaults.colors(),
                                         shape = RoundedCornerShape(10.dp)
                                     )
                                     OutlinedTextField(
-                                        value = reminderTime,
-                                        onValueChange = { reminderTime = it },
-                                        placeholder = { Text("HH:MM", color = TextTertiary) },
-                                        modifier = Modifier.weight(1f),
+                                        value = reminderMillis?.let { DateTimeUtil.formatTime(it) } ?: "",
+                                        onValueChange = {},
+                                        placeholder = { Text("Pick time", color = TextTertiary) },
+                                        modifier = Modifier.weight(1f).clickable { if (reminderMillis != null) showRemTimePicker = true },
+                                        readOnly = true,
                                         singleLine = true,
+                                        enabled = reminderMillis != null,
+                                        leadingIcon = { Icon(Icons.Default.Schedule, null, tint = TextTertiary, modifier = Modifier.size(18.dp)) },
+                                        trailingIcon = { Icon(Icons.Default.ExpandMore, null, tint = TextTertiary) },
                                         colors = OutlinedTextFieldDefaults.colors(),
                                         shape = RoundedCornerShape(10.dp)
                                     )
@@ -367,8 +372,8 @@ fun TaskFormScreen(
                 // ── Submit Button ──
                 Button(
                     onClick = {
-                        val dueTimestamp = DateTimeUtil.parseDateTime(dueDate, dueTime)
-                        val reminderTimestamp = if (hasReminder) DateTimeUtil.parseDateTime(reminderDate, reminderTime) else null
+                        val dueTimestamp = dueMillis
+                        val reminderTimestamp = if (hasReminder) reminderMillis else null
                         val interval = if (repeatReminder) (repeatInterval.toLongOrNull() ?: 0) * 60000 else null
 
                         val task = Task(
@@ -414,6 +419,98 @@ fun TaskFormScreen(
             }
         }
     }
-}
 
-// DateTimeUtil.parseDateTime helper is in DateTimeUtil.kt
+    // ── Due Date Picker ──
+    if (showDueDatePicker) {
+        val state = rememberDatePickerState(initialSelectedDateMillis = dueMillis ?: System.currentTimeMillis())
+        DatePickerDialog(
+            onDismissRequest = { showDueDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    state.selectedDateMillis?.let { selected ->
+                        dueMillis = if (dueMillis != null) DateTimeUtil.replaceDate(dueMillis!!, selected)
+                                    else DateTimeUtil.replaceTime(selected, 12, 0)
+                    }
+                    showDueDatePicker = false
+                }) { Text("OK", color = Teal) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDueDatePicker = false }) { Text("Cancel", color = TextSecondary) }
+            },
+            colors = DatePickerDefaults.colors(containerColor = DarkSurface)
+        ) {
+            DatePicker(state = state)
+        }
+    }
+
+    // ── Due Time Picker ──
+    if (showDueTimePicker) {
+        val state = rememberTimePickerState(
+            initialHour = dueMillis?.let { java.util.Calendar.getInstance().apply { timeInMillis = it }.get(java.util.Calendar.HOUR_OF_DAY) } ?: 12,
+            initialMinute = dueMillis?.let { java.util.Calendar.getInstance().apply { timeInMillis = it }.get(java.util.Calendar.MINUTE) } ?: 0,
+            is24Hour = false
+        )
+        AlertDialog(
+            onDismissRequest = { showDueTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    dueMillis = DateTimeUtil.replaceTime(dueMillis ?: System.currentTimeMillis(), state.hour, state.minute)
+                    showDueTimePicker = false
+                }) { Text("OK", color = Teal) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDueTimePicker = false }) { Text("Cancel", color = TextSecondary) }
+            },
+            title = { Text("Select Time", color = TextPrimary) },
+            containerColor = DarkSurface,
+            text = { TimePicker(state = state) }
+        )
+    }
+
+    // ── Reminder Date Picker ──
+    if (showRemDatePicker) {
+        val state = rememberDatePickerState(initialSelectedDateMillis = reminderMillis ?: System.currentTimeMillis())
+        DatePickerDialog(
+            onDismissRequest = { showRemDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    state.selectedDateMillis?.let { selected ->
+                        reminderMillis = if (reminderMillis != null) DateTimeUtil.replaceDate(reminderMillis!!, selected)
+                                        else DateTimeUtil.replaceTime(selected, 9, 0)
+                    }
+                    showRemDatePicker = false
+                }) { Text("OK", color = Teal) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRemDatePicker = false }) { Text("Cancel", color = TextSecondary) }
+            },
+            colors = DatePickerDefaults.colors(containerColor = DarkSurface)
+        ) {
+            DatePicker(state = state)
+        }
+    }
+
+    // ── Reminder Time Picker ──
+    if (showRemTimePicker) {
+        val state = rememberTimePickerState(
+            initialHour = reminderMillis?.let { java.util.Calendar.getInstance().apply { timeInMillis = it }.get(java.util.Calendar.HOUR_OF_DAY) } ?: 9,
+            initialMinute = reminderMillis?.let { java.util.Calendar.getInstance().apply { timeInMillis = it }.get(java.util.Calendar.MINUTE) } ?: 0,
+            is24Hour = false
+        )
+        AlertDialog(
+            onDismissRequest = { showRemTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    reminderMillis = DateTimeUtil.replaceTime(reminderMillis ?: System.currentTimeMillis(), state.hour, state.minute)
+                    showRemTimePicker = false
+                }) { Text("OK", color = Teal) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRemTimePicker = false }) { Text("Cancel", color = TextSecondary) }
+            },
+            title = { Text("Select Time", color = TextPrimary) },
+            containerColor = DarkSurface,
+            text = { TimePicker(state = state) }
+        )
+    }
+}
