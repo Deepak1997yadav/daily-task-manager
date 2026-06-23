@@ -153,19 +153,23 @@ fun TaskListScreen(
                                 animationSpec = tween(1000, easing = EaseOutCubic), label = ""
                             )
                             Canvas(modifier = Modifier.fillMaxSize()) {
+                                val strokeW = 5.dp.toPx()
+                                val r = size.minDimension / 2 - strokeW / 2
+                                val arcSize = androidx.compose.ui.geometry.Size(r * 2, r * 2)
                                 drawCircle(
                                     color = DarkSurfaceHigh,
-                                    style = Stroke(width = 5.dp.toPx()),
-                                    center = center
+                                    style = Stroke(width = strokeW),
+                                    center = center,
+                                    radius = r + strokeW / 2
                                 )
                                 drawArc(
                                     color = Teal,
                                     startAngle = -90f,
                                     sweepAngle = sweepAngle,
                                     useCenter = false,
-                                    style = Stroke(width = 5.dp.toPx(), cap = StrokeCap.Round),
-                                    topLeft = Offset(size.minDimension / 2 - radius, size.minDimension / 2 - radius),
-                                    size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
+                                    style = Stroke(width = strokeW, cap = StrokeCap.Round),
+                                    topLeft = Offset(center.x - r, center.y - r),
+                                    size = arcSize
                                 )
                             }
                             Text(

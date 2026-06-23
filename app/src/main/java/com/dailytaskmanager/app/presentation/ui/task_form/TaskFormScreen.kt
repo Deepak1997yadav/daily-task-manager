@@ -68,14 +68,14 @@ fun TaskFormScreen(
             priority = task.priority
             task.dueDate?.let { d ->
                 val cal = java.util.Calendar.getInstance().apply { timeInMillis = d }
-                dueDate = String.format("%04d-%02d-%02d", get(1), get(2) + 1, get(5))
-                dueTime = String.format("%02d:%02d", get(11), get(12))
+                dueDate = String.format("%04d-%02d-%02d", cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH) + 1, cal.get(java.util.Calendar.DAY_OF_MONTH))
+                dueTime = String.format("%02d:%02d", cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE))
             }
             task.reminderTime?.let { r ->
                 hasReminder = true
                 val cal = java.util.Calendar.getInstance().apply { timeInMillis = r }
-                reminderDate = String.format("%04d-%02d-%02d", get(1), get(2) + 1, get(5))
-                reminderTime = String.format("%02d:%02d", get(11), get(12))
+                reminderDate = String.format("%04d-%02d-%02d", cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH) + 1, cal.get(java.util.Calendar.DAY_OF_MONTH))
+                reminderTime = String.format("%02d:%02d", cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE))
             }
             repeatReminder = task.repeatInterval != null
             task.repeatInterval?.let { repeatInterval = (it / 60000).toString() }
