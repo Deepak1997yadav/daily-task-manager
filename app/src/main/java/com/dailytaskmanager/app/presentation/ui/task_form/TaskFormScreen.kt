@@ -32,6 +32,12 @@ import androidx.compose.ui.unit.sp
 import com.dailytaskmanager.app.domain.model.Task
 import com.dailytaskmanager.app.presentation.viewmodel.TaskViewModel
 import com.dailytaskmanager.app.ui.theme.*
+import com.dailytaskmanager.app.ui.theme.DarkSurface
+import com.dailytaskmanager.app.ui.theme.DarkSurfaceHigh
+import com.dailytaskmanager.app.ui.theme.Teal
+import com.dailytaskmanager.app.ui.theme.TextPrimary
+import com.dailytaskmanager.app.ui.theme.TextSecondary
+import com.dailytaskmanager.app.ui.theme.TextTertiary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,7 +136,7 @@ fun TaskFormScreen(
                     placeholder = { Text("What needs to be done?", color = TextTertiary) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    colors = textFieldColors(),
+                    colors = tfc(),
                     shape = RoundedCornerShape(12.dp)
                 )
 
@@ -144,14 +150,14 @@ fun TaskFormScreen(
                     placeholder = { Text("Add details...", color = TextTertiary) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3,
-                    colors = textFieldColors(),
+                    colors = tfc(),
                     shape = RoundedCornerShape(12.dp)
                 )
 
                 Spacer(Modifier.height(20.dp))
 
                 // ── Category ──
-                SectionLabel("Category")
+                sectionLabel("Category")
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     catKeys.forEachIndexed { i, key ->
@@ -189,7 +195,7 @@ fun TaskFormScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // ── Priority ──
-                SectionLabel("Priority")
+                sectionLabel("Priority")
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     val prioValues = listOf(1, 2, 3, 4)
@@ -229,7 +235,7 @@ fun TaskFormScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // ── Assignee ──
-                SectionLabel("Assignee")
+                sectionLabel("Assignee")
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = assignee,
@@ -245,7 +251,7 @@ fun TaskFormScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // ── Due Date ──
-                SectionLabel("Due Date & Time")
+                sectionLabel("Due Date & Time")
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
@@ -423,7 +429,7 @@ fun TaskFormScreen(
 }
 
 @Composable
-private fun SectionLabel(text: String) {
+fun sectionLabel(text: String) {
     Text(
         text,
         style = MaterialTheme.typography.labelMedium.copy(
@@ -434,8 +440,7 @@ private fun SectionLabel(text: String) {
     )
 }
 
-@Composable
-private fun textFieldColors() = OutlinedTextFieldDefaults.colors(
+fun tfc() = OutlinedTextFieldDefaults.colors(
     focusedBorderColor = Teal.copy(alpha = 0.6f),
     unfocusedBorderColor = DarkSurfaceHigh,
     cursorColor = Teal,
@@ -447,7 +452,7 @@ private fun textFieldColors() = OutlinedTextFieldDefaults.colors(
     unfocusedContainerColor = DarkSurface
 )
 
-private fun parseDateTime(date: String, time: String): Long? {
+fun parseDateTime(date: String, time: String): Long? {
     if (date.isBlank()) return null
     val parts = date.split("-")
     if (parts.size != 3) return null
