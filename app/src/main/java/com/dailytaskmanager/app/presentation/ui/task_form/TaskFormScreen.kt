@@ -55,13 +55,9 @@ fun TaskFormScreen(
     var repeatReminder by remember { mutableStateOf(false) }
     var repeatInterval by remember { mutableStateOf("") }
 
-    data class Cat(val key: String, val label: String, val color: Color)
-    val categories = listOf(
-        Cat("general", "General", CategoryGeneral),
-        Cat("meeting", "Meeting", CategoryMeeting),
-        Cat("project", "Project", CategoryProject),
-        Cat("followUp", "Follow Up", CategoryFollowUp)
-    )
+    val catKeys = listOf("general", "meeting", "project", "followUp")
+    val catLabels = listOf("General", "Meeting", "Project", "Follow Up")
+    val catColors = listOf(CategoryGeneral, CategoryMeeting, CategoryProject, CategoryFollowUp)
 
     LaunchedEffect(taskId) {
         taskId?.let { viewModel.loadTaskById(it) }
@@ -158,29 +154,30 @@ fun TaskFormScreen(
                 SectionLabel("Category")
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    categories.forEach { cat ->
-                        val selected = category == cat.key
+                    catKeys.forEachIndexed { i, key ->
+                        val selected = category == key
+                        val color = catColors[i]
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(
-                                    if (selected) cat.color.copy(alpha = 0.15f)
+                                    if (selected) color.copy(alpha = 0.15f)
                                     else DarkSurfaceHigh.copy(alpha = 0.5f)
                                 )
                                 .border(
                                     1.dp,
-                                    if (selected) cat.color.copy(alpha = 0.4f) else Color.Transparent,
+                                    if (selected) color.copy(alpha = 0.4f) else Color.Transparent,
                                     RoundedCornerShape(12.dp)
                                 )
-                                .clickable { category = cat.key }
+                                .clickable { category = key }
                                 .padding(vertical = 10.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                cat.label,
+                                catLabels[i],
                                 style = MaterialTheme.typography.labelMedium.copy(
-                                    color = if (selected) cat.color else TextSecondary,
+                                    color = if (selected) color else TextSecondary,
                                     fontWeight = if (selected) FontWeight.W600 else FontWeight.W400,
                                     fontSize = 11.sp
                                 )
@@ -195,36 +192,33 @@ fun TaskFormScreen(
                 SectionLabel("Priority")
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    data class Prio(val value: Int, val label: String, val color: Color)
-                    val prios = listOf(
-                        Prio(1, "Low", PriorityLow),
-                        Prio(2, "Medium", PriorityMedium),
-                        Prio(3, "High", PriorityHigh),
-                        Prio(4, "Urgent", PriorityUrgent)
-                    )
-                    prios.forEach { prio ->
-                        val selected = priority == prio.value
+                    val prioValues = listOf(1, 2, 3, 4)
+                    val prioLabels = listOf("Low", "Medium", "High", "Urgent")
+                    val prioColors = listOf(PriorityLow, PriorityMedium, PriorityHigh, PriorityUrgent)
+                    prioValues.forEachIndexed { i, p ->
+                        val selected = priority == p
+                        val color = prioColors[i]
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
-                                    if (selected) prio.color.copy(alpha = 0.15f)
+                                    if (selected) color.copy(alpha = 0.15f)
                                     else DarkSurfaceHigh.copy(alpha = 0.5f)
                                 )
                                 .border(
                                     1.dp,
-                                    if (selected) prio.color.copy(alpha = 0.4f) else Color.Transparent,
+                                    if (selected) color.copy(alpha = 0.4f) else Color.Transparent,
                                     RoundedCornerShape(10.dp)
                                 )
-                                .clickable { priority = prio.value }
+                                .clickable { priority = p }
                                 .padding(vertical = 9.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                prio.label,
+                                prioLabels[i],
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    color = if (selected) prio.color else TextSecondary,
+                                    color = if (selected) color else TextSecondary,
                                     fontWeight = if (selected) FontWeight.W700 else FontWeight.W400
                                 )
                             )
