@@ -1,16 +1,37 @@
 package com.dailytaskmanager.app.presentation.ui.task_form
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.dailytaskmanager.app.domain.model.Task
 import com.dailytaskmanager.app.presentation.viewmodel.TaskViewModel
+import com.dailytaskmanager.app.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,9 +54,13 @@ fun TaskFormScreen(
     var reminderTime by remember { mutableStateOf("") }
     var repeatReminder by remember { mutableStateOf(false) }
     var repeatInterval by remember { mutableStateOf("") }
-    var categoryExpanded by remember { mutableStateOf(false) }
 
-    val categories = listOf("general" to "General", "meeting" to "Meeting", "project" to "Project", "followUp" to "Follow Up")
+    val categories = listOf(
+        "general" to "General" to CategoryGeneral,
+        "meeting" to "Meeting" to CategoryMeeting,
+        "project" to "Project" to CategoryProject,
+        "followUp" to "Follow Up" to CategoryFollowUp
+    )
 
     LaunchedEffect(taskId) {
         taskId?.let { viewModel.loadTaskById(it) }
@@ -60,200 +85,371 @@ fun TaskFormScreen(
                 reminderTime = String.format("%02d:%02d", get(11), get(12))
             }
             repeatReminder = task.repeatInterval != null
-            task.repeatInterval?.let {
-                repeatInterval = (it / 60000).toString()
-            }
+            task.repeatInterval?.let { repeatInterval = (it / 60000).toString() }
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(if (taskId == null) "New Task" else "Edit Task") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text("Title *") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text("Description") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 2
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            Text("Category", style = MaterialTheme.typography.labelMedium)
-            Spacer(Modifier.height(4.dp))
-            ExposedDropdownMenuBox(
-                expanded = categoryExpanded,
-                onExpandedChange = { categoryExpanded = it }
-            ) {
-                OutlinedTextField(
-                    value = categories.find { it.first == category }?.second ?: "General",
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(DarkBackground, DarkSurface, DarkBackground)
                 )
-                ExposedDropdownMenu(
-                    expanded = categoryExpanded,
-                    onDismissRequest = { categoryExpanded = false }
-                ) {
-                    categories.forEach { (key, label) ->
-                        DropdownMenuItem(
-                            text = { Text(label) },
-                            onClick = { category = key; categoryExpanded = false }
+            )
+    ) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            if (taskId == null) "New Task" else "Edit Task",
+                            fontWeight = FontWeight.W600,
+                            color = TextPrimary
                         )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.Default.ArrowBack, null, tint = TextSecondary)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                )
+            }
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 20.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // ── Title ──
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Task title") },
+                    placeholder = { Text("What needs to be done?", color = TextTertiary) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    colors = textFieldColors(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                // ── Description ──
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    placeholder = { Text("Add details...", color = TextTertiary) },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                    colors = textFieldColors(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(Modifier.height(20.dp))
+
+                // ── Category ──
+                SectionLabel("Category")
+                Spacer(Modifier.height(8.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    categories.forEach { ((key, label), catColor) ->
+                        val selected = category == key
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(
+                                    if (selected) catColor.copy(alpha = 0.15f)
+                                    else DarkSurfaceHigh.copy(alpha = 0.5f)
+                                )
+                                .border(
+                                    1.dp,
+                                    if (selected) catColor.copy(alpha = 0.4f) else Color.Transparent,
+                                    RoundedCornerShape(12.dp)
+                                )
+                                .clickable { category = key }
+                                .padding(vertical = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                label,
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    color = if (selected) catColor else TextSecondary,
+                                    fontWeight = if (selected) FontWeight.W600 else FontWeight.W400,
+                                    fontSize = 11.sp
+                                )
+                            )
+                        }
                     }
                 }
-            }
 
-            Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(20.dp))
 
-            Text("Priority", style = MaterialTheme.typography.labelMedium)
-            Spacer(Modifier.height(4.dp))
-            Row(Modifier.fillMaxWidth()) {
-                listOf(1 to "Low", 2 to "Medium", 3 to "High", 4 to "Urgent").forEach { (p, label) ->
-                    FilterChip(
-                        selected = priority == p,
-                        onClick = { priority = p },
-                        label = { Text(label) },
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = assignee,
-                onValueChange = { assignee = it },
-                label = { Text("Assigned To") },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Enter name or email") }
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            Text("Due Date & Time", style = MaterialTheme.typography.labelMedium)
-            Spacer(Modifier.height(4.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = dueDate,
-                    onValueChange = { dueDate = it },
-                    label = { Text("Date") },
-                    placeholder = { Text("YYYY-MM-DD") },
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = dueTime,
-                    onValueChange = { dueTime = it },
-                    label = { Text("Time") },
-                    placeholder = { Text("HH:MM") },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-            HorizontalDivider()
-            Spacer(Modifier.height(12.dp))
-
-            Text("Reminder", style = MaterialTheme.typography.titleSmall)
-            Spacer(Modifier.height(8.dp))
-
-            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                Checkbox(checked = hasReminder, onCheckedChange = { hasReminder = it })
-                Text("Set reminder")
-            }
-
-            if (hasReminder) {
+                // ── Priority ──
+                SectionLabel("Priority")
+                Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val prios = listOf(
+                        1 to "Low" to PriorityLow,
+                        2 to "Medium" to PriorityMedium,
+                        3 to "High" to PriorityHigh,
+                        4 to "Urgent" to PriorityUrgent
+                    )
+                    prios.forEach { ((p, label), priColor) ->
+                        val selected = priority == p
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    if (selected) priColor.copy(alpha = 0.15f)
+                                    else DarkSurfaceHigh.copy(alpha = 0.5f)
+                                )
+                                .border(
+                                    1.dp,
+                                    if (selected) priColor.copy(alpha = 0.4f) else Color.Transparent,
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .clickable { priority = p }
+                                .padding(vertical = 9.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                label,
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = if (selected) priColor else TextSecondary,
+                                    fontWeight = if (selected) FontWeight.W700 else FontWeight.W400
+                                )
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // ── Assignee ──
+                SectionLabel("Assignee")
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = assignee,
+                    onValueChange = { assignee = it },
+                    placeholder = { Text("Name or email", color = TextTertiary) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    leadingIcon = { Icon(Icons.Default.Person, null, tint = TextTertiary, modifier = Modifier.size(18.dp)) },
+                    colors = textFieldColors(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(Modifier.height(20.dp))
+
+                // ── Due Date ──
+                SectionLabel("Due Date & Time")
+                Spacer(Modifier.height(8.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
-                        value = reminderDate,
-                        onValueChange = { reminderDate = it },
-                        label = { Text("Reminder Date") },
-                        placeholder = { Text("YYYY-MM-DD") },
-                        modifier = Modifier.weight(1f)
+                        value = dueDate,
+                        onValueChange = { dueDate = it },
+                        placeholder = { Text("YYYY-MM-DD", color = TextTertiary) },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        leadingIcon = { Icon(Icons.Default.CalendarMonth, null, tint = TextTertiary, modifier = Modifier.size(18.dp)) },
+                        colors = textFieldColors(),
+                        shape = RoundedCornerShape(12.dp)
                     )
                     OutlinedTextField(
-                        value = reminderTime,
-                        onValueChange = { reminderTime = it },
-                        label = { Text("Reminder Time") },
-                        placeholder = { Text("HH:MM") },
-                        modifier = Modifier.weight(1f)
+                        value = dueTime,
+                        onValueChange = { dueTime = it },
+                        placeholder = { Text("HH:MM", color = TextTertiary) },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        leadingIcon = { Icon(Icons.Default.Schedule, null, tint = TextTertiary, modifier = Modifier.size(18.dp)) },
+                        colors = textFieldColors(),
+                        shape = RoundedCornerShape(12.dp)
                     )
                 }
 
-                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                    Checkbox(checked = repeatReminder, onCheckedChange = { repeatReminder = it })
-                    Text("Repeat every")
+                Spacer(Modifier.height(24.dp))
+
+                // ── Reminder Section ──
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(DarkSurfaceVariant.copy(alpha = 0.3f))
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Notifications, null, Modifier.size(20.dp), tint = Amber)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Reminder", style = MaterialTheme.typography.titleSmall.copy(color = TextPrimary, fontWeight = FontWeight.W600))
+                            }
+                            Switch(
+                                checked = hasReminder,
+                                onCheckedChange = { hasReminder = it },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Teal,
+                                    checkedTrackColor = Teal.copy(alpha = 0.3f),
+                                    uncheckedThumbColor = TextTertiary,
+                                    uncheckedTrackColor = DarkSurfaceHigh
+                                )
+                            )
+                        }
+
+                        AnimatedVisibility(visible = hasReminder) {
+                            Column {
+                                Spacer(Modifier.height(12.dp))
+                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    OutlinedTextField(
+                                        value = reminderDate,
+                                        onValueChange = { reminderDate = it },
+                                        placeholder = { Text("YYYY-MM-DD", color = TextTertiary) },
+                                        modifier = Modifier.weight(1f),
+                                        singleLine = true,
+                                        colors = textFieldColors(),
+                                        shape = RoundedCornerShape(10.dp)
+                                    )
+                                    OutlinedTextField(
+                                        value = reminderTime,
+                                        onValueChange = { reminderTime = it },
+                                        placeholder = { Text("HH:MM", color = TextTertiary) },
+                                        modifier = Modifier.weight(1f),
+                                        singleLine = true,
+                                        colors = textFieldColors(),
+                                        shape = RoundedCornerShape(10.dp)
+                                    )
+                                }
+
+                                Spacer(Modifier.height(12.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.Repeat, null, Modifier.size(16.dp), tint = TextSecondary)
+                                        Spacer(Modifier.width(6.dp))
+                                        Text("Repeat", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                                    }
+                                    Switch(
+                                        checked = repeatReminder,
+                                        onCheckedChange = { repeatReminder = it },
+                                        colors = SwitchDefaults.colors(
+                                            checkedThumbColor = Teal,
+                                            checkedTrackColor = Teal.copy(alpha = 0.3f),
+                                            uncheckedThumbColor = TextTertiary,
+                                            uncheckedTrackColor = DarkSurfaceHigh
+                                        )
+                                    )
+                                }
+
+                                if (repeatReminder) {
+                                    Spacer(Modifier.height(8.dp))
+                                    OutlinedTextField(
+                                        value = repeatInterval,
+                                        onValueChange = { repeatInterval = it },
+                                        placeholder = { Text("e.g. 60", color = TextTertiary) },
+                                        label = { Text("Interval (minutes)", color = TextSecondary) },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        singleLine = true,
+                                        colors = textFieldColors(),
+                                        shape = RoundedCornerShape(10.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
-                if (repeatReminder) {
-                    OutlinedTextField(
-                        value = repeatInterval,
-                        onValueChange = { repeatInterval = it },
-                        label = { Text("Repeat interval (minutes)") },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("e.g. 60") }
+                Spacer(Modifier.height(32.dp))
+
+                // ── Submit Button ──
+                Button(
+                    onClick = {
+                        val dueTimestamp = parseDateTime(dueDate, dueTime)
+                        val reminderTimestamp = if (hasReminder) parseDateTime(reminderDate, reminderTime) else null
+                        val interval = if (repeatReminder) (repeatInterval.toLongOrNull() ?: 0) * 60000 else null
+
+                        val task = Task(
+                            id = taskId ?: 0,
+                            title = title,
+                            description = description,
+                            timestamp = System.currentTimeMillis(),
+                            dueDate = dueTimestamp,
+                            assignee = assignee,
+                            priority = priority,
+                            category = category,
+                            reminderTime = reminderTimestamp,
+                            repeatInterval = interval,
+                            isDone = selectedTask?.isDone ?: false
+                        )
+                        if (taskId == null) viewModel.addTask(task) else viewModel.updateTask(task)
+                        onBack()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    enabled = title.isNotBlank(),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Teal,
+                        contentColor = DarkBackground,
+                        disabledContainerColor = DarkSurfaceHigh
+                    )
+                ) {
+                    Icon(
+                        if (taskId == null) Icons.Default.Add else Icons.Default.Save,
+                        null, Modifier.size(20.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        if (taskId == null) "Create Task" else "Update Task",
+                        fontWeight = FontWeight.W700,
+                        fontSize = 15.sp
                     )
                 }
-            }
 
-            Spacer(Modifier.height(24.dp))
-
-            Button(
-                onClick = {
-                    val dueTimestamp = parseDateTime(dueDate, dueTime)
-                    val reminderTimestamp = if (hasReminder) parseDateTime(reminderDate, reminderTime) else null
-                    val interval = if (repeatReminder) (repeatInterval.toLongOrNull() ?: 0) * 60000 else null
-
-                    val task = Task(
-                        id = taskId ?: 0,
-                        title = title,
-                        description = description,
-                        timestamp = System.currentTimeMillis(),
-                        dueDate = dueTimestamp,
-                        assignee = assignee,
-                        priority = priority,
-                        category = category,
-                        reminderTime = reminderTimestamp,
-                        repeatInterval = interval,
-                        isDone = selectedTask?.isDone ?: false
-                    )
-                    if (taskId == null) viewModel.addTask(task) else viewModel.updateTask(task)
-                    onBack()
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = title.isNotBlank()
-            ) {
-                Text(if (taskId == null) "Add Task" else "Update Task")
+                Spacer(Modifier.height(40.dp))
             }
         }
     }
 }
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.labelMedium.copy(
+            color = TextSecondary,
+            fontWeight = FontWeight.W600,
+            letterSpacing = 0.5.sp
+        )
+    )
+}
+
+@Composable
+private fun textFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = Teal.copy(alpha = 0.6f),
+    unfocusedBorderColor = DarkSurfaceHigh,
+    cursorColor = Teal,
+    focusedLabelColor = TextSecondary,
+    unfocusedLabelColor = TextTertiary,
+    focusedTextColor = TextPrimary,
+    unfocusedTextColor = TextPrimary,
+    focusedContainerColor = DarkSurface,
+    unfocusedContainerColor = DarkSurface
+)
 
 private fun parseDateTime(date: String, time: String): Long? {
     if (date.isBlank()) return null
